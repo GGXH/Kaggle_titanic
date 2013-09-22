@@ -123,3 +123,15 @@ res = model.fit()
 # save the result for outputing predictions later
 results['Logit'] = [res, formula]
 res.summary()
+
+##Logit regression
+formula = 'Survived ~ C(Pclass) + C(Sex) + Age + SibSp + C(Embarked)'
+results = {}
+
+y,x = dmatrices(formula,data=df,return_type='dataframe')
+model = sm.Logit(y,x)
+
+res = model.fit()
+
+results['Logit'] = [res, formula]
+print res.summary()
