@@ -122,16 +122,55 @@ res = model.fit()
 
 # save the result for outputing predictions later
 results['Logit'] = [res, formula]
-res.summary()
-
-##Logit regression
-formula = 'Survived ~ C(Pclass) + C(Sex) + Age + SibSp + C(Embarked)'
-results = {}
-
-y,x = dmatrices(formula,data=df,return_type='dataframe')
-model = sm.Logit(y,x)
-
-res = model.fit()
-
-results['Logit'] = [res, formula]
 print res.summary()
+
+
+##--plot of result of logit
+plt.figure(figsize=(18,4));
+plt.subplot(121,axisbg="#DBDBDB")
+ypred = res.predict(x)
+plt.plot(x.index,ypred,'bo',x.index,y,'mo',alpha=.25);
+plt.grid(color='white',linestyle='dashed')
+plt.title('Logit predictions, Blue: \nFitted/predicted values: Red');
+
+plt.subplot(122,axisbg="#DBDBDB")
+plt.plot(res.resid, 'r-')
+plt.grid(color='white',linestyle='dashed')
+plt.title('Logit Residuals');
+plt.show()
+
+##--check if how the result behaves
+
+fig = plt.figure(figsize=(18,9), dpi=1600)
+a = .2
+
+# Below are examples of more advanced plotting. 
+# It it looks strange check out the tutorial above.
+fig.add_subplot(221, axisbg="#DBDBDB")
+kde_res = statsmodels.nonparametric.kde(res.predict())
+kde_res.fit()
+plt.plot(kde_res.support,kde_res.density)
+plt.fill_between(kde_res.support,kde_res.density, alpha=a)
+title("Distribution of our Predictions")
+
+fig.add_subplot(222, axisbg="#DBDBDB")
+plt.scatter(res.predict(),x['C(sex)[T.male]'] , alpha=a)
+plt.grid(b=True, which='major', axis='x')
+plt.xlabel("Predicted chance of survival")
+plt.ylabel("Gender Bool")
+title("The Change of Survival Probability by Gender (1 = Male)")
+
+fig.add_subplot(223, axisbg="#DBDBDB")
+plt.scatter(res.predict(),x['C(pclass)[T.3]'] , alpha=a)
+plt.xlabel("Predicted chance of survival")
+plt.ylabel("Class Bool")
+plt.grid(b=True, which='major', axis='x')
+title("The Change of Survival Probability by Lower Class (1 = 3rd Class)")
+
+fig.add_subplot(224, axisbg="#DBDBDB")
+plt.scatter(res.predict(),x.age , alpha=a)
+plt.grid(True, linewidth=0.15)
+title("The Change of Survival Probability by Age")
+plt.xlabel("Predicted chance of survival")
+plt.ylabel("Age")
+plt.show()
